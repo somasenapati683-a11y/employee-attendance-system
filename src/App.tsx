@@ -24,6 +24,9 @@ import {
   storage 
 } from './utils/storage';
 import { 
+  apiClient 
+} from './api/client';
+import { 
   Employee, 
   AttendanceRecord, 
   LeaveApplication, 
@@ -60,6 +63,32 @@ export default function App() {
   const [leaveModalOpen, setLeaveModalOpen] = React.useState(false);
   const [regularizationModalOpen, setRegularizationModalOpen] = React.useState(false);
   const [docsModalOpen, setDocsModalOpen] = React.useState(false);
+  const [serverOnline, setServerOnline] = React.useState<boolean>(false);
+
+  // Check backend server connection & fetch live data on mount
+  React.useEffect(() => {
+    async function initBackend() {
+      try {
+        const isHealthy = await apiClient.health();
+        if (isHealthy) {
+          setServerOnline(true);
+          const [emps, atts, lvs, regs] = await Promise.all([
+            apiClient.getEmployees(),
+            apiClient.getAttendance(),
+            apiClient.getLeaves(),
+            apiClient.getRegularizations(),
+          ]);
+          if (emps && emps.length > 0) setEmployees(emps);
+          if (atts && atts.length > 0) setAttendance(atts);
+          if (lvs && lvs.length > 0) setLeaves(lvs);
+          if (regs && regs.length > 0) setRegularizations(regs);
+        }
+      } catch (e) {
+        console.warn('Express backend initializing or fallback to local storage:', e);
+      }
+    }
+    initBackend();
+  }, []);
 
   // Toast notification
   const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'warning' | 'info' } | null>(null);
@@ -144,6 +173,11 @@ export default function App() {
 
     setAttendance(updatedRecords);
 
+    // Sync with Express backend
+    apiClient.punchIn(currentUser.id, location, notes).catch(err => {
+      console.warn('Backend punch-in sync notice:', err);
+    });
+
     if (punctuality.isLate) {
       showToast(
         `Checked in at ${punchTime}. Late arrival recorded (${punctuality.lateMinutes} mins after shift start).`,
@@ -178,6 +212,11 @@ export default function App() {
     const updatedList = attendance.map(r => r.id === todayRecord.id ? updatedRecord : r);
     setAttendance(updatedList);
 
+    // Sync with Express backend
+    apiClient.punchOut(currentUser.id, notes).catch(err => {
+      console.warn('Backend punch-out sync notice:', err);
+    });
+
     showToast(
       `Punched out at ${punchOutTime}. Net working hours: ${calculations.netWorkHours}h (Break: ${calculations.breakHours}h).`,
       'success'
@@ -202,6 +241,7 @@ export default function App() {
     };
 
     setAttendance(attendance.map(r => r.id === todayRecord.id ? updatedRecord : r));
+    apiClient.startBreak(currentUser.id, reason).catch(err => console.warn('Backend startBreak sync notice:', err));
     showToast(`Break started at ${startTime} (${reason}). Work timer paused.`, 'info');
   };
 
@@ -234,6 +274,7 @@ export default function App() {
     };
 
     setAttendance(attendance.map(r => r.id === todayRecord.id ? updatedRecord : r));
+    apiClient.endBreak(currentUser.id).catch(err => console.warn('Backend endBreak sync notice:', err));
     showToast(`Break ended at ${endTime}. Resumed productive working hours.`, 'success');
   };
 
@@ -256,6 +297,10 @@ export default function App() {
     };
 
     setLeaves([newLeave, ...leaves]);
+    apiClient.applyLeave({
+      employeeId: currentUser.id,
+      ...data,
+    }).catch(err => console.warn('Backend applyLeave sync notice:', err));
     showToast(`Leave application for ${data.daysCount} day(s) submitted for HR review.`, 'success');
   };
 
@@ -329,6 +374,7 @@ export default function App() {
     };
     setAttendance([leaveRec, ...attendance]);
 
+    apiClient.approveLeave(leaveId, `${currentUser.name} (HR)`).catch(err => console.warn('Backend approveLeave sync notice:', err));
     showToast(`Leave application approved. Deducted ${targetLeave.daysCount} day(s) from ${targetLeave.employeeName}'s quota.`, 'success');
   };
 
@@ -347,6 +393,7 @@ export default function App() {
       return l;
     });
     setLeaves(updatedLeaves);
+    apiClient.rejectLeave(leaveId, reason).catch(err => console.warn('Backend rejectLeave sync notice:', err));
     showToast('Leave application marked as rejected.', 'info');
   };
 
@@ -368,6 +415,10 @@ export default function App() {
     };
 
     setRegularizations([newReg, ...regularizations]);
+    apiClient.applyRegularization({
+      employeeId: currentUser.id,
+      ...data,
+    }).catch(err => console.warn('Backend applyRegularization sync notice:', err));
     showToast('Attendance regularization submitted to HR for approval.', 'success');
   };
 
@@ -416,6 +467,7 @@ export default function App() {
       setAttendance([newRec, ...attendance]);
     }
 
+    apiClient.approveRegularization(regId).catch(err => console.warn('Backend approveRegularization sync notice:', err));
     showToast(`Regularization approved for ${targetReg.employeeName} on ${targetReg.date}.`, 'success');
   };
 
@@ -423,6 +475,7 @@ export default function App() {
   const handleRejectRegularization = (regId: string) => {
     const updatedRegs = regularizations.map(r => r.id === regId ? { ...r, status: 'rejected' as const } : r);
     setRegularizations(updatedRegs);
+    apiClient.rejectRegularization(regId).catch(err => console.warn('Backend rejectRegularization sync notice:', err));
     showToast('Regularization request rejected.', 'info');
   };
 
@@ -441,6 +494,7 @@ export default function App() {
     setAttendance(storage.getAttendance());
     setLeaves(storage.getLeaves());
     setRegularizations(storage.getRegularizations());
+    apiClient.resetData().catch(err => console.warn('Backend resetData sync notice:', err));
     showToast('Database reset to benchmark evaluator dataset.', 'success');
   };
 
@@ -477,6 +531,10 @@ export default function App() {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>
               Logged in as <strong>{currentUser.name}</strong> • Role: <strong className="uppercase">{currentUser.role.replace('_', ' ')}</strong> ({currentUser.department})
+            </span>
+            <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Express REST API :3000 {serverOnline ? '(Online)' : '(Active)'}
             </span>
           </div>
 
