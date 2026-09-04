@@ -114,8 +114,7 @@ employee-attendance-system/
 │   ├── main.tsx
 │   └── types.ts
 │
-├── .env.example
-├── .gitignore
+
 ├── index.html
 ├── package.json
 ├── server.ts
