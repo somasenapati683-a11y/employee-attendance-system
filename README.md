@@ -1,73 +1,124 @@
-🕒 Employee Attendance Management System
-A modern Employee Attendance Management System built with React, TypeScript, Vite, and Express.js. The application provides a centralized platform for managing employee attendance, check-in/check-out records, leave applications, attendance deductions, and regularization requests.
+# 🕒 Employee Attendance Management System
 
-It includes separate dashboards and workflows for HR/Admin users and employees, making attendance management easier, faster, and more organized.
+A modern and user-friendly **Employee Attendance Management System** built to simplify employee attendance, leave management, regularization, deductions, and employee administration.
 
-🚀 Features
-👨‍💼 Employee Management
-View and manage employee information
-Maintain employee records
-Employee-focused dashboard
-Track employee attendance history
-🕐 Attendance Management
-Employee check-in and check-out
-Record attendance timestamps
-View attendance history
-Monitor attendance status
-Centralized attendance records
-🏖️ Leave Management
-Submit leave applications
-Track leave requests
-Manage leave status
-Automatic leave-related attendance handling
-🔄 Attendance Regularization
-Submit regularization requests for attendance issues
-Review and manage regularization requests
-Maintain regularization records
-📊 HR/Admin Dashboard
-Overview of employee attendance
-Monitor attendance records
-Manage employees
-Review leave applications
-Manage regularization requests
-Monitor attendance deductions
-🔐 Authentication & Access
-Authentication workflow
-Employee and HR/Admin roles
-Role-based application views
-Protected application functionality
-🛠️ Technology Stack
-Frontend
-React 19
-TypeScript
-Vite
-Tailwind CSS
-Lucide React — icons
-Motion — animations
-Backend
-Node.js
-Express.js
-TypeScript
-tsx
-dotenv
-Development & Build Tools
-Vite
-esbuild
-TypeScript
-Tailwind CSS
-📁 Project Structure
-text
+## 🚀 Features
+
+### 👨‍💼 Employee Management
+
+- Add and manage employee information
+- View employee details
+- Manage employee records
+- Employee dashboard
+
+### 🕐 Attendance Management
+
+- Employee check-in
+- Employee check-out
+- Track attendance records
+- View attendance history
+- Monitor attendance status
+
+### 🏖️ Leave Management
+
+- Apply for leave
+- View leave requests
+- Manage leave status
+- Track employee leave records
+
+### 🔄 Attendance Regularization
+
+- Submit attendance regularization requests
+- Manage attendance correction requests
+- Review regularization records
+
+### 💰 Attendance Deduction
+
+- Manage attendance-related deductions
+- Track deduction records
+- View deduction information
+
+### 🔐 Authentication
+
+- User login
+- Role-based access
+- Employee and HR/Admin workflows
+- Protected application features
+
+### 📊 HR/Admin Dashboard
+
+- View employee information
+- Monitor attendance
+- Manage leave requests
+- Review regularization requests
+- Manage deductions
+- Centralized HR management
+
+---
+
+## 🛠️ Technologies Used
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Lucide React
+- Motion
+
+### Backend
+
+- Node.js
+- Express.js
+- TypeScript
+- dotenv
+
+### Development Tools
+
+- Vite
+- TypeScript
+- npm
+- Git & GitHub
+
+---
+
+## 📁 Project Structure
+
+```text
 employee-attendance-system/
+│
 ├── backend/
 │   ├── routes/
+│   │   ├── attendanceRoutes.ts
+│   │   ├── authRoutes.ts
+│   │   ├── deductionRoutes.ts
+│   │   ├── employeeRoutes.ts
+│   │   ├── leaveRoutes.ts
+│   │   └── regularizationRoutes.ts
+│   │
 │   ├── app.ts
 │   ├── db.ts
-│   └── server.ts
-├── src/
-│   ├── components/
-│   ├── api/
-│   ├── App.tsx
-│   └── main.tsx
+│   └── index.ts
+│
 ├── public/
+│   └── assets/
+│
+├── src/
+│   ├── api/
+│   ├── components/
+│   ├── data/
+│   ├── utils/
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── types.ts
+│
+├── .env.example
+├── .gitignore
+├── index.html
 ├── package.json
-└── vite.config.ts
+├── server.ts
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
