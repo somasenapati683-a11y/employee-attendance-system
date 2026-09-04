@@ -1,0 +1,6 @@
+{
+  "name": "Employee Attendance Management System",
+  "description": "Comprehensive Employee Attendance Management System for Inner Eye Consultancy Services featuring real-time check-in/out, working hours & overtime calculations, automated leave deduction engine, HR & Employee dashboards, and attendance tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
