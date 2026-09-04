@@ -56,37 +56,18 @@ esbuild
 TypeScript
 Tailwind CSS
 📁 Project Structure
+text
 employee-attendance-system/
-│
 ├── backend/
 │   ├── routes/
-│   │   ├── attendanceRoutes.ts
-│   │   ├── authRoutes.ts
-│   │   ├── deductionRoutes.ts
-│   │   ├── employeeRoutes.ts
-│   │   ├── leaveRoutes.ts
-│   │   └── regularizationRoutes.ts
-│   │
 │   ├── app.ts
 │   ├── db.ts
-│   └── index.ts
-│
-├── public/
-│   └── assets/
-│
+│   └── server.ts
 ├── src/
-│   ├── api/
 │   ├── components/
-│   ├── data/
-│   ├── utils/
+│   ├── api/
 │   ├── App.tsx
-│   ├── index.css
-│   ├── main.tsx
-│   └── types.ts
-│
-├── .env.example
-├── index.html
+│   └── main.tsx
+├── public/
 ├── package.json
-├── server.ts
-├── tsconfig.json
 └── vite.config.ts
